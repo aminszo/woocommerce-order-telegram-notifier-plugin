@@ -19,26 +19,47 @@ function send_order_to_telegram($order_id)
 
     // Get order details
     $order = wc_get_order($order_id);
-    $order_data = $order->get_data();
 
-    $items = $order->get_items();
-    $product_list = '';
-    foreach ($items as $item) {
-        $product_list .= $item->get_name() . ' - Quantity: ' . $item->get_quantity() . "\n";
+    $order_id = $order->get_id();
+    $date = $order->get_date_paid()->getTimestamp();
+    $order_items = $order->get_items();
+    $buyer = $order->get_formatted_billing_full_name();
+    $full_address = $order->get_shipping_state() . " . " . $order->get_shipping_city() . " . " . $order->get_shipping_address_1() . " . " . $order->get_shipping_address_2();
+    $postal_code = $order->get_shipping_postcode();
+    $phone_number = $order->get_billing_phone();
+    $shipping_method = $order->get_shipping_method();
+    $customer_note = $order->get_customer_note();
+    $total = $order->get_total();
+    $shipping_total = $order->get_shipping_total();
+
+    $all_items = "";
+    foreach ($order_items as $item_id => $item) {
+        $all_items .= $item->get_name() . " - x" . $item->get_quantity() . "\n";
     }
 
-    // Prepare message to send
-    $message = "New Order Received!\n";
-    $message .= "Order ID: " . $order_id . "\n";
-    $message .= "Customer: " . $order_data['billing']['first_name'] . " " . $order_data['billing']['last_name'] . "\n";
-    $message .= "Email: " . $order_data['billing']['email'] . "\n";
-    $message .= "Total: " . $order_data['total'] . "\n";
-    $message .= "Products: \n" . $product_list;
+    $message_text = "
+        سفارش $order_id
+        تاریخ : $date\n
+        کالا ها :
+        $all_items
+        مجموع پرداختی : $total تومان
+        ----------------------------------------------
+        خریدار : $buyer
+        آدرس : $full_address \n
+        کد پستی : $postal_code
+        تلفن : $phone_number \n
+        پست : $shipping_method - $shipping_total تومان \n
+    ";
 
-    // Send message to Telegram
-    send_telegram_message($message);
+    if (strlen($customer_note) > 0) {
+        $message_text .= "یادداشت مشتری : $customer_note \n";
+    }
+
+    $message_text .= "----------------------------------------------\n \u{1F7E2}";
 }
 
+
+// send order summary to telegram channel using bot api
 function send_telegram_message($message)
 {
     $pipedream_endpoint = "https://eo7yqs3zurbk8iy.m.pipedream.net";

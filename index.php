@@ -10,6 +10,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once "jalali-date-v2.76.php";
+
 // Hook into WooCommerce order processing
 add_action('woocommerce_thankyou', 'send_order_to_telegram', 10, 1);
 
@@ -22,6 +24,7 @@ function send_order_to_telegram($order_id)
 
     $order_id = $order->get_id();
     $date = $order->get_date_paid()->getTimestamp();
+    $jalali_date = jdate("d-m-Y", $date);
     $order_items = $order->get_items();
     $buyer = $order->get_formatted_billing_full_name();
     $full_address = $order->get_shipping_state() . " . " . $order->get_shipping_city() . " . " . $order->get_shipping_address_1() . " . " . $order->get_shipping_address_2();
@@ -39,7 +42,7 @@ function send_order_to_telegram($order_id)
 
     $message_text = "
         سفارش $order_id
-        تاریخ : $date\n
+        تاریخ : $jalali_date\n
         کالا ها :
         $all_items
         مجموع پرداختی : $total تومان

@@ -12,6 +12,7 @@
 defined('ABSPATH') || exit;
 
 require_once "includes/jalali-date-v2.76.php";
+require_once "admin/settings.php";
 
 // Hook into WooCommerce order processing
 add_action('woocommerce_thankyou', 'tgon_send_new_order_to_telegram');

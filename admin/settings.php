@@ -8,13 +8,15 @@ function tgon_add_admin_menu()
 {
     add_submenu_page(
         'woocommerce', // Parent slug (WooCommerce)
-        __('Telegram Notifications'), // Page title
-        __('Telegram Notifications'), // Menu title
+        __('Telegram Notifications', 'wc-tgon'), // Page title
+        __('Telegram Notifications', 'wc-tgon'), // Menu title
         'manage_options', // Capability
         'wc_telegram_notifications', // Menu slug
         'tgon_settings_page' // Function to display the settings page
     );
 }
+
+
 
 // Display the settings page
 function tgon_settings_page()

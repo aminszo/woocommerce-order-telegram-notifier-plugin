@@ -7,6 +7,8 @@
  * Version: 0.1
  * Author: Amin SalehiZade
  * Author URI: https://aminlog.ir
+ * Text Domain: wc-tgon
+ * Domain Path: /lang
  */
 
 defined('ABSPATH') || exit;
@@ -14,6 +16,12 @@ defined('ABSPATH') || exit;
 // === Plugin Initialization ===
 
 // Add admin settings page
+
+function tgon_load_textdomain() {
+    load_plugin_textdomain('wc-tgon', false, dirname(plugin_basename(__FILE__)) . '/lang');
+}
+add_action('plugins_loaded', 'tgon_load_textdomain');
+
 require_once "admin/settings.php";
 
 // Hook into WooCommerce order processing

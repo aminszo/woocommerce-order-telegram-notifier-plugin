@@ -1,0 +1,70 @@
+# Copyright (C) 2024 Amin SalehiZade
+# This file is distributed under the same license as the WooCommerce Telegram Order Notification plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce Telegram Order Notification 0.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wc-order-"
+"notifier\n"
+"POT-Creation-Date: 2024-10-30T19:27:00+01:00\n"
+"PO-Revision-Date: 2024-10-30 22:00+0330\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fa_IR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.5\n"
+"X-Domain: wc-tgon\n"
+
+#. Plugin Name of the plugin
+#: plugin.php
+msgid "WooCommerce Telegram Order Notification"
+msgstr "اطلاع رسانی سفارش های ووکامرس در تلگرام"
+
+#. Plugin URI of the plugin
+#: plugin.php
+msgid "https://github.com/aminszo/woocommerce-order-telegram-notifier-plugin/"
+msgstr ""
+
+#. Description of the plugin
+#: plugin.php
+msgid "Sends WooCommerce order details to Telegram when a new order is placed."
+msgstr "جزئیات سفارش جدید ووکامرس را به تلگرام ارسال میکند."
+
+#. Author of the plugin
+#: plugin.php
+msgid "Amin SalehiZade"
+msgstr "امین صالحی زاده"
+
+#. Author URI of the plugin
+#: plugin.php
+msgid "https://aminlog.ir"
+msgstr ""
+
+#: admin/settings.php:11 admin/settings.php:12
+msgid "Telegram Notifications"
+msgstr "نوتیفیکیشن تلگرام"
+
+#: admin/setting_page.php:18
+msgid "Invalid URL for the Pipedream endpoint. Please enter a valid URL."
+msgstr "یک آدرس URL معتبر برای Pipedream Endpoint وارد کنید."
+
+#: admin/setting_page.php:24
+msgid "Settings saved!."
+msgstr "تنظیمات ذخیره شد."
+
+#: admin/setting_page.php:47
+msgid "Pipedream Endpoint"
+msgstr "آدرس Pipedream Endpoint"
+
+#: admin/setting_page.php:51
+msgid "Telegram Bot API Token"
+msgstr "توکن API ربات تلگرام"
+
+#: admin/setting_page.php:55
+msgid "Chat ID"
+msgstr "آیدی چت تلگرام"
+
+#: admin/setting_page.php:59
+msgid "Save Settings"
+msgstr "ذخیره تنظیمات"

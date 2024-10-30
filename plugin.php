@@ -11,14 +11,21 @@
 
 defined('ABSPATH') || exit;
 
-require_once "includes/jalali-date-v2.76.php";
+// === Plugin Initialization ===
+
+// Add admin settings page
 require_once "admin/settings.php";
 
 // Hook into WooCommerce order processing
 add_action('woocommerce_thankyou', 'tgon_send_new_order_to_telegram');
 
+// === END of Plugin init ===
+
+
 function tgon_send_new_order_to_telegram($order_id)
 {
+
+    require_once "includes/jalali-date-v2.76.php";
     $message = tgon_prepare_message($order_id);
 
     // if $message is false, means there is an error.
@@ -84,10 +91,16 @@ function tgon_prepare_message($order_id)
 // send order summary to telegram channel using bot api
 function tgon_send_telegram_message($message)
 {
-    $pipedream_endpoint = "https://eo7yqs3zurbk8iy.m.pipedream.net";
+
+    // Retrieve values from db
+    $pipedream_endpoint = get_option('tgon_pipedream_endpoint', '');
+    $chat_id = get_option('tgon_chat_id', '');
+    $api_token = get_option('tgon_api_token', '');
 
     $Payloads = [
         "msg" => $message,
+        "api_token" => $api_token,
+        "chat_id" => $chat_id,
     ];
 
     $response = wp_remote_post($pipedream_endpoint, array(

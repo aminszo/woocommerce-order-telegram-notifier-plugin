@@ -17,7 +17,8 @@ defined('ABSPATH') || exit;
 
 // Add admin settings page
 
-function tgon_load_textdomain() {
+function tgon_load_textdomain()
+{
     load_plugin_textdomain('wc-tgon', false, dirname(plugin_basename(__FILE__)) . '/lang');
 }
 add_action('plugins_loaded', 'tgon_load_textdomain');
@@ -47,51 +48,36 @@ function tgon_prepare_message($order_id)
 {
     if (!$order_id) return false;
 
+    // Get the message template
+    $template = get_option('tgon_message_template', "Order {order_id} placed by {buyer_name} for a total of {total}.");
+
     // Get order details
-
     $order_obj = wc_get_order($order_id);
-    $order = [];
 
-    $order['id'] = $order_obj->get_id();
-    $order['date'] = $order_obj->get_date_paid()->getTimestamp();
-    $order['jalali_date'] = jdate("d-m-Y", $order['date']);
-    $order['items'] = $order_obj->get_items();
-    $order['buyer'] = $order_obj->get_formatted_billing_full_name();
-    $order['full_address'] = $order_obj->get_shipping_state() . ". " . $order_obj->get_shipping_city() . ". " . $order_obj->get_shipping_address_1() . " . " . $order_obj->get_shipping_address_2();
-    $order['postal_code'] = $order_obj->get_shipping_postcode();
-    $order['phone_number'] = $order_obj->get_billing_phone();
-    $order['shipping_method'] = $order_obj->get_shipping_method();
-    $order['customer_note'] = $order_obj->get_customer_note();
-    $order['total'] = $order_obj->get_total();
-    $order['shipping_total'] = $order_obj->get_shipping_total();
+    $order['{date}'] = $order_obj->get_date_paid()->getTimestamp();
+    $order['{divider}'] = "----------------------------------------------";
 
-    $order['all_items'] = "";
-    foreach ($order['items'] as $item_id => $item) {
-        $order['all_items'] .= $item->get_name() . " - x" . $item->get_quantity() . "\n";
+    $order = [
+        '{order_id}'        => $order_obj->get_id(),
+        '{jalali_date}'     => jdate("d-m-Y", $order['{date}']),
+        '{items}'           => $order_obj->get_items(),
+        '{buyer_name}'      => $order_obj->get_formatted_billing_full_name(),
+        '{full_address}'    => $order_obj->get_shipping_state() . ". " . $order_obj->get_shipping_city() . ". " . $order_obj->get_shipping_address_1() . " . " . $order_obj->get_shipping_address_2(),
+        '{postal_code}'     => $order_obj->get_shipping_postcode(),
+        '{phone_number}'    => $order_obj->get_billing_phone(),
+        '{shipping_method}' => $order_obj->get_shipping_method(),
+        '{customer_note}'   => $order_obj->get_customer_note(),
+        '{total}'           => $order_obj->get_total(),
+        '{shipping_total}'  => $order_obj->get_shipping_total(),
+    ];
+
+    $order['{all_items}'] = "";
+    foreach ($order['{items}'] as $item_id => $item) {
+        $order['{all_items}'] .= $item->get_name() . " - x" . $item->get_quantity() . "\n";
     }
 
-    $divider = "----------------------------------------------";
-
-    // a custom emoji in uft8 format
-    $new_message_symbol = "\u{1F7E2}";
-
-    $message_text = "
-        سفارش {$order['id']}
-        تاریخ : {$order['jalali_date']}\n
-        کالا ها :
-        {$order['all_items']}
-        مجموع پرداختی : {$order['total']} تومان
-        {$divider}
-        خریدار : {$order['buyer']}
-        آدرس : {$order['full_address']} \n
-        کد پستی : {$order['postal_code']}
-        تلفن : {$order['phone_number']} \n
-        پست : {$order['shipping_method']} - {$order['shipping_total']} تومان \n
-    ";
-
-    strlen($order['customer_note']) < 0 ?: $message_text .= "یادداشت مشتری : {$order['customer_note']} \n";
-
-    $message_text .= "$divider \n $new_message_symbol";
+    // Replace placeholders in template with actual order data
+    $message_text = str_replace(array_keys($order), array_values($order), $template);
 
     return $message_text;
 }

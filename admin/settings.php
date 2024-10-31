@@ -12,14 +12,12 @@ function tgon_add_admin_menu()
         __('Telegram Notifications', 'wc-tgon'), // Menu title
         'manage_options', // Capability
         'wc_telegram_notifications', // Menu slug
-        'tgon_settings_page' // Function to display the settings page
+        'tgon_settings_page_callback' // Function to display the settings page
     );
 }
 
-
-
 // Display the settings page
-function tgon_settings_page()
+function tgon_settings_page_callback()
 {
     $admin = new Tgon_admin();
     $admin->render_settings_page();

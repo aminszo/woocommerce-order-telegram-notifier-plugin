@@ -16,11 +16,10 @@ if (isset($_POST['tgon_save_settings'])) {
 
     $this->input['message_template'] = htmlspecialchars($_POST['message_template']);
 
-    // Validate the URL
-    if (!filter_var($this->input['pipedream_endpoint'], FILTER_VALIDATE_URL)) {
-        $error_message = __('Invalid URL for the Pipedream endpoint. Please enter a valid URL.', 'wc-tgon');
-    } else {
-        // If URL is valid, save the settings
+    $this->validate_inputs();
+
+    if (empty($this->error_message)) {
+        // If inputs are valid save the settings
         update_option('tgon_pipedream_endpoint',  $this->input['pipedream_endpoint']);
         update_option('tgon_chat_id', $this->input['chat_id']);
         update_option('tgon_api_token', $this->input['api_token']);
@@ -42,9 +41,9 @@ $template = get_option('tgon_message_template', "Order {order_id} placed by {buy
     <h1><? echo __('Telegram Notifications Settings', 'wc-tgon') ?></h1>
 
     <!-- Display error message if exists -->
-    <?php if ($error_message): ?>
+    <?php if ($this->error_message): ?>
         <div class="error">
-            <p><?php echo esc_html($error_message); ?></p>
+            <p><?php echo esc_html($this->error_message); ?></p>
         </div>
     <?php endif; ?>
 

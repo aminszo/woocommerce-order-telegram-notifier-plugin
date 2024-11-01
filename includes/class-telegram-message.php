@@ -19,12 +19,13 @@ class tgon_telegram_message
 
         require_once "jalali-date-v2.76.php";
 
+
         $order['{date}'] = $order_obj->get_date_paid()->getTimestamp();
         $order['{divider}'] = "----------------------------------------------";
 
         $order = [
             '{order_id}'        => $order_obj->get_id(),
-            '{jalali_date}'     => jdate("d-m-Y", $order['{date}']),
+            '{order_date}'     => jdate("d-m-Y", $order['{date}']),
             '{items}'           => $order_obj->get_items(),
             '{buyer_name}'      => $order_obj->get_formatted_billing_full_name(),
             '{full_address}'    => $order_obj->get_shipping_state() . ". " . $order_obj->get_shipping_city() . ". " . $order_obj->get_shipping_address_1() . " . " . $order_obj->get_shipping_address_2(),

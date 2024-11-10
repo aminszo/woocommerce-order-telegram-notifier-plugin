@@ -6,7 +6,7 @@ $error_message = '';
 // Save settings if the form is submitted
 if (isset($_POST['tgon_save_settings'])) {
 
-    // Retrieve and sanitize input
+    // Retrieve and sanitize input values from the form submission
     $this->retrieve_post_inputs([
         'pipedream_endpoint',
         'api_token',
@@ -14,10 +14,12 @@ if (isset($_POST['tgon_save_settings'])) {
         // 'message_template',
     ]);
 
+    // Validate inputs to ensure they are correct
     $this->validate_inputs();
 
+    // Check if there are no validation errors
     if (empty($this->error_message)) {
-        // If inputs are valid save the settings
+        // If inputs are valid save the settings to WordPress options table
         update_option('tgon_pipedream_endpoint',  $this->input['pipedream_endpoint']);
         update_option('tgon_chat_id', $this->input['chat_id']);
         update_option('tgon_api_token', $this->input['api_token']);
@@ -25,21 +27,22 @@ if (isset($_POST['tgon_save_settings'])) {
         update_option('tgon_message_template', $this->input['message_template']);
         update_option('tgon_enable_persian_date', $this->input['enable_persian_date']);
 
+        // Display success message
         echo '<div class="updated"><p>' . __('Settings saved!.', 'wc-tgon') . '</p></div>';
     }
 }
 
-// Retrieve existing values
+// Retrieve existing values from the options table to pre-populate the form
 $pipedream_endpoint = get_option('tgon_pipedream_endpoint', '');
-$chat_id = get_option('tgon_chat_id', '');
-$api_token = get_option('tgon_api_token', '');
-$options = get_option('tgon_order_statuses', []);
+$chat_id = get_option('tgon_chat_id', ''); // Chat ID for Telegram
+$api_token = get_option('tgon_api_token', ''); // Telegram API token
+$options = get_option('tgon_order_statuses', []); // Order statuses that trigger messages
 
 if (empty($options))
-    $options = [];
+    $options = []; // Ensure options is an empty array if no values are found
 
-$enable_jalali_date = get_option('tgon_enable_persian_date', false);
-$template = get_option('tgon_message_template', "Order {order_id} placed by {buyer_name} for a total of {total}.");
+$enable_jalali_date = get_option('tgon_enable_persian_date', false); // Whether to convert date to Persian (Jalali)
+$template = get_option('tgon_message_template', "Order {order_id} placed by {buyer_name} for a total of {total}."); // message template
 
 
 ?>
@@ -53,6 +56,7 @@ $template = get_option('tgon_message_template', "Order {order_id} placed by {buy
         </div>
     <?php endif; ?>
 
+    <!-- Form for saving the settings -->
     <form method="post" action="">
         <table class="form-table">
             <tr valign="top">
@@ -90,7 +94,7 @@ $template = get_option('tgon_message_template', "Order {order_id} placed by {buy
                         _e('Customize the message format that will be sent to Telegram. Use the following placeholders to insert order details dynamically:', 'wc-tgon');
                         echo "<br/><br/>";
 
-                        // Render message template placeholders
+                        // Render message template placeholders with descriptions
                         foreach ($this->template_placeholders as $placeholder => $description) {
                             echo "$placeholder : $description <br/>";
                         }

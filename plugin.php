@@ -29,8 +29,18 @@ function tgon_send_new_order_to_telegram($order_id)
 {
     // Debug log to check if this function is firing
     // error_log("Telegram Notification: Order #$order_id processing.");
-    
-    $tg_message = new tgon_telegram_message($order_id);
+
+    $order = wc_get_order($order_id);
+
+    $statuses = get_option('tgon_order_statuses', ['on-hold', 'processing']);
+
+    if (empty($statuses))
+        $statuses = [];
+
+    if ( ! in_array($order->get_status(), $statuses) )
+        return;
+
+    $tg_message = new tgon_telegram_message($order);
     $tg_message->prepare_message();
     $tg_message->send_message();
 }

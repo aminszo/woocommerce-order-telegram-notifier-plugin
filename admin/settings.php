@@ -55,6 +55,11 @@ class Tgon_admin
         foreach ($field_names as $field) {
             $this->input[$field] = isset($_POST[$field]) ? sanitize_text_field($_POST[$field]) : null;
         }
+
+        $this->input['message_template'] = isset($_POST['message_template']) ? htmlspecialchars($_POST['message_template']) : null;
+        $this->input['order_statuses'] = isset($_POST['order_statuses']) ? $_POST['order_statuses'] : null ;
+        $this->input['enable_persian_date'] = isset($_POST['enable_persian_date']) ? $_POST['enable_persian_date'] : null ;
+
     }
 
 

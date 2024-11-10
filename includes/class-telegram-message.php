@@ -2,11 +2,11 @@
 
 class tgon_telegram_message
 {
-    public $order_id, $message_text;
+    public $order, $message_text;
 
-    public function __construct($orderID)
+    public function __construct($order)
     {
-        $this->order_id = $orderID;
+        $this->order = $order;
     }
 
     public function prepare_message()
@@ -16,32 +16,50 @@ class tgon_telegram_message
         $message_template = get_option('tgon_message_template', $default_message_template);
 
         // Get order object
-        $order_obj = wc_get_order($this->order_id);
+        $order_obj = $this->order;
 
         require_once "jalali-date-v2.76.php";
 
-        // Get order details
-        $order['{date}'] = $order_obj->get_date_paid()->getTimestamp();
+        $order['{status}'] = $order_obj->get_status(); // Get order status
+
+        if ($order['{status}'] === 'on-hold')
+            $order['{date}'] = $order_obj->get_date_created();  // Get order creation date
+        else
+            $order['{date}'] = $order_obj->get_date_paid();  // Get order paid date
+
+        // Check if Persian date conversion is enabled
+        $enable_persian_date = get_option('tgon_enable_persian_date', false);
+
+        if ($enable_persian_date) {
+            // Convert to Persian (Jalali) date
+            $order['{date}'] = jdate("d-m-Y", $order['{date}']->getTimestamp());
+        } else {
+            // Use standard date format
+            $order['{date}'] = date("d-m-Y", $order['{date}']->getTimestamp());
+        }
+
+
         $order['{divider}'] = "----------------------------------------------";
 
-        $order = [
-            '{order_id}'        => $order_obj->get_id(),
-            '{order_date}'     => jdate("d-m-Y", $order['{date}']),
+        $order = array_merge($order, [
+            '{id}'              => $order_obj->get_id(),
             '{items}'           => $order_obj->get_items(),
             '{buyer_name}'      => $order_obj->get_formatted_billing_full_name(),
             '{full_address}'    => $order_obj->get_shipping_state() . ". " . $order_obj->get_shipping_city() . ". " . $order_obj->get_shipping_address_1() . " . " . $order_obj->get_shipping_address_2(),
             '{postal_code}'     => $order_obj->get_shipping_postcode(),
             '{phone_number}'    => $order_obj->get_billing_phone(),
+            '{payment_method}'  => $order_obj->get_payment_method_title(),
             '{shipping_method}' => $order_obj->get_shipping_method(),
             '{customer_note}'   => $order_obj->get_customer_note(),
             '{total}'           => $order_obj->get_total(),
             '{shipping_total}'  => $order_obj->get_shipping_total(),
-        ];
+        ]);
 
         $order['{all_items}'] = "";
         foreach ($order['{items}'] as $item_id => $item) {
             $order['{all_items}'] .= $item->get_name() . " - x" . $item->get_quantity() . "\n";
         }
+        unset($order['{items}']);
 
         // Replace placeholders in template with actual order data
         $this->message_text = str_replace(array_keys($order), array_values($order), $message_template);

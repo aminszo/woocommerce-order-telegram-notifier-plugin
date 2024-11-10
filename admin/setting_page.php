@@ -14,8 +14,6 @@ if (isset($_POST['tgon_save_settings'])) {
         // 'message_template',
     ]);
 
-    $this->input['message_template'] = htmlspecialchars($_POST['message_template']);
-
     $this->validate_inputs();
 
     if (empty($this->error_message)) {
@@ -23,7 +21,9 @@ if (isset($_POST['tgon_save_settings'])) {
         update_option('tgon_pipedream_endpoint',  $this->input['pipedream_endpoint']);
         update_option('tgon_chat_id', $this->input['chat_id']);
         update_option('tgon_api_token', $this->input['api_token']);
+        update_option('tgon_order_statuses', $this->input['order_statuses']);
         update_option('tgon_message_template', $this->input['message_template']);
+        update_option('tgon_enable_persian_date', $this->input['enable_persian_date']);
 
         echo '<div class="updated"><p>' . __('Settings saved!.', 'wc-tgon') . '</p></div>';
     }
@@ -33,6 +33,12 @@ if (isset($_POST['tgon_save_settings'])) {
 $pipedream_endpoint = get_option('tgon_pipedream_endpoint', '');
 $chat_id = get_option('tgon_chat_id', '');
 $api_token = get_option('tgon_api_token', '');
+$options = get_option('tgon_order_statuses', []);
+
+if (empty($options))
+    $options = [];
+
+$enable_jalali_date = get_option('tgon_enable_persian_date', false);
 $template = get_option('tgon_message_template', "Order {order_id} placed by {buyer_name} for a total of {total}.");
 
 
@@ -60,6 +66,20 @@ $template = get_option('tgon_message_template', "Order {order_id} placed by {buy
             <tr valign="top">
                 <th scope="row"><?php _e('Chat ID', 'wc-tgon') ?></th>
                 <td><input type="text" dir='ltr' name="chat_id" value="<?php echo esc_attr($chat_id); ?>" size="50" /></td>
+            </tr>
+            <tr valign="top">
+                <th scope="row"><?php _e('Send message when order is :', 'wc-tgon') ?></th>
+                <td>
+                    <input type="checkbox" name="order_statuses[]" value="on-hold" <?php checked(in_array('on-hold', $options)); ?>> On-Hold<br>
+                    <input type="checkbox" name="order_statuses[]" value="processing" <?php checked(in_array('processing', $options)); ?>> Processing<br>
+                </td>
+            </tr>
+            <tr valign="top">
+                <th scope="row"><?php _e('Convert date to jalali :', 'wc-tgon') ?></th>
+                <td>
+                    <input type="checkbox" name="enable_persian_date" value="1" <?php checked(1, $enable_jalali_date, true); ?> />
+                </td>
+
             </tr>
             <tr valign="top">
                 <th scope="row"><?php _e('Message Template', 'wc-tgon') ?></th>

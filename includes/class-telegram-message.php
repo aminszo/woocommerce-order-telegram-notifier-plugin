@@ -12,14 +12,15 @@ class tgon_telegram_message
     public function prepare_message()
     {
         // Get the message template
-        $template = get_option('tgon_message_template', "Order {order_id} placed by {buyer_name} for a total of {total}.");
+        $default_message_template = "Order {order_id} placed by {buyer_name} for a total of {total}.";
+        $message_template = get_option('tgon_message_template', $default_message_template);
 
-        // Get order details
+        // Get order object
         $order_obj = wc_get_order($this->order_id);
 
         require_once "jalali-date-v2.76.php";
 
-
+        // Get order details
         $order['{date}'] = $order_obj->get_date_paid()->getTimestamp();
         $order['{divider}'] = "----------------------------------------------";
 
@@ -43,7 +44,7 @@ class tgon_telegram_message
         }
 
         // Replace placeholders in template with actual order data
-        $this->message_text = str_replace(array_keys($order), array_values($order), $template);
+        $this->message_text = str_replace(array_keys($order), array_values($order), $message_template);
     }
 
     // send order summary to telegram channel using bot api

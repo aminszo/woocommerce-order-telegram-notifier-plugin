@@ -35,25 +35,14 @@ class tgon_telegram_message
         // Get the order object
         $order_obj = $this->order;
 
-        // Include the Jalali date conversion library
-        require_once "jalali-date-v2.76.php";
-
         // Add order status to the data array
         $order['{status}'] = $order_obj->get_status(); // Get the current status of the order
 
         // Set the order date to the payment date if available; otherwise, use the order creation date as a fallback.
         $order['{date}'] = $order_obj->get_date_paid() ?? $order_obj->get_date_created();
 
-        // Check if Persian (Jalali) date conversion is enabled
-        $enable_persian_date = get_option('tgon_enable_persian_date', false);
-
-        if ($enable_persian_date) {
-            // Convert the date to Persian (Jalali) format
-            $order['{date}'] = jdate("d-m-Y", $order['{date}']->getTimestamp());
-        } else {
-            // Use the standard date format
-            $order['{date}'] = date("d-m-Y", $order['{date}']->getTimestamp());
-        }
+        // convert date timestamp to standard date format in local timezone.
+        $order['{date}'] = wp_date('d-m-Y', $order['{date}']->getTimestamp(), wp_timezone());
 
         // Add a divider line for message readability
         $order['{divider}'] = "----------------------------------------------";

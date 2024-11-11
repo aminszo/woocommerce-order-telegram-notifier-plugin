@@ -25,7 +25,6 @@ if (isset($_POST['tgon_save_settings'])) {
         update_option('tgon_api_token', $this->input['api_token']);
         update_option('tgon_order_statuses', $this->input['order_statuses']);
         update_option('tgon_message_template', $this->input['message_template']);
-        update_option('tgon_enable_persian_date', $this->input['enable_persian_date']);
 
         // Display success message
         echo '<div class="updated"><p>' . __('Settings saved!.', 'wc-tgon') . '</p></div>';
@@ -41,7 +40,6 @@ $options = get_option('tgon_order_statuses', []); // Order statuses that trigger
 if (empty($options))
     $options = []; // Ensure options is an empty array if no values are found
 
-$enable_jalali_date = get_option('tgon_enable_persian_date', false); // Whether to convert date to Persian (Jalali)
 $template = get_option('tgon_message_template', "Order {order_id} placed by {buyer_name} for a total of {total}."); // message template
 
 
@@ -79,13 +77,6 @@ $template = get_option('tgon_message_template', "Order {order_id} placed by {buy
                     <input type="checkbox" name="order_statuses[]" value="cancelled" <?php checked(in_array('cancelled', $options)); ?>><?php _e('Cancelled', 'wc-tgon')?><br>
                     <input type="checkbox" name="order_statuses[]" value="failed" <?php checked(in_array('failed', $options)); ?>><?php _e('Failed', 'wc-tgon')?><br>
                 </td>
-            </tr>
-            <tr valign="top">
-                <th scope="row"><?php _e('Convert date to jalali :', 'wc-tgon') ?></th>
-                <td>
-                    <input type="checkbox" name="enable_persian_date" value="1" <?php checked(1, $enable_jalali_date, true); ?> />
-                </td>
-
             </tr>
             <tr valign="top">
                 <th scope="row"><?php _e('Message Template', 'wc-tgon') ?></th>

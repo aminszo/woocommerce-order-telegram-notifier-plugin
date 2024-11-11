@@ -1,56 +1,71 @@
 <?php
 
-// Variable to store error message
-$error_message = '';
-
 // Save settings if the form is submitted
 if (isset($_POST['tgon_save_settings'])) {
 
     // Retrieve and sanitize input values from the form submission
     $this->retrieve_post_inputs([
-        'pipedream_endpoint',
+        'middleman_endpoint',
         'api_token',
         'chat_id',
-        // 'message_template',
     ]);
 
     // Validate inputs to ensure they are correct
     $this->validate_inputs();
 
-    // Check if there are no validation errors
-    if (empty($this->error_message)) {
-        // If inputs are valid save the settings to WordPress options table
-        update_option('tgon_pipedream_endpoint',  $this->input['pipedream_endpoint']);
-        update_option('tgon_chat_id', $this->input['chat_id']);
-        update_option('tgon_api_token', $this->input['api_token']);
-        update_option('tgon_order_statuses', $this->input['order_statuses']);
-        update_option('tgon_message_template', $this->input['message_template']);
+    // if there are no validation errors, save the settings to WordPress options table.
+    if (empty($this->error_messages)) {
+
+        $old_settings = get_option('tgon_settings', []);
+
+        $middleman_endpoint = $old_settings['middleman_endpoint'] ?? null;
+
+        // update the middleman endpoint value only id use_middelman is selected. otherwise, use the old value.
+        if ($this->input['use_middleman'] === 1) {
+            $middleman_endpoint = $this->input['middleman_endpoint'];
+        }
+
+        $tgon_settings = [
+            'use_middleman' => $this->input['use_middleman'],
+            'middleman_endpoint' =>  $middleman_endpoint,
+            'chat_id' => $this->input['chat_id'],
+            'api_token' => $this->input['api_token'],
+            'acceptable_order_statuses' => $this->input['acceptable_order_statuses'],
+            'message_template' => $this->input['message_template'],
+        ];
+
+        update_option('tgon_settings', $tgon_settings);
 
         // Display success message
-        echo '<div class="updated"><p>' . __('Settings saved!.', 'wc-tgon') . '</p></div>';
+        echo '<div class="updated"><p>' . esc_html__('Settings saved!', 'telegram-order-notification') . '</p></div>';
     }
 }
 
 // Retrieve existing values from the options table to pre-populate the form
-$pipedream_endpoint = get_option('tgon_pipedream_endpoint', '');
-$chat_id = get_option('tgon_chat_id', ''); // Chat ID for Telegram
-$api_token = get_option('tgon_api_token', ''); // Telegram API token
-$options = get_option('tgon_order_statuses', []); // Order statuses that trigger messages
+$saved_settings = get_option('tgon_settings', []);
 
-if (empty($options))
-    $options = []; // Ensure options is an empty array if no values are found
+$use_middleman = (isset($saved_settings['use_middleman']) and in_array($saved_settings['use_middleman'], [0,1])) ? $saved_settings['use_middleman'] : 0;
+$middleman_endpoint = $saved_settings['middleman_endpoint'] ?? '';
+$chat_id = $saved_settings['chat_id'] ?? ''; // Chat ID for Telegram
+$api_token = $saved_settings['api_token'] ?? ''; // Telegram API token
+$order_status_options = $saved_settings['acceptable_order_statuses'] ?? []; // Order statuses that trigger messages
 
-$template = get_option('tgon_message_template', "Order {order_id} placed by {buyer_name} for a total of {total}."); // message template
+// If no statuses are set (the value is an empty string), use an empty array to prevent errors
+empty($order_status_options) && $order_status_options = [];
 
-
+$template = $saved_settings['message_template'] ?? esc_html__('Order {order_id} placed by {buyer_name} for a total of {total}.', 'telegram-order-notification'); // message template
 ?>
 <div class="wrap">
-    <h1><? echo __('Telegram Notifications Settings', 'wc-tgon') ?></h1>
+    <h1><?php esc_html_e('Telegram Notifications Settings', 'telegram-order-notification') ?></h1>
 
     <!-- Display error message if exists -->
-    <?php if ($this->error_message): ?>
+    <?php if ($this->error_messages): ?>
         <div class="error">
-            <p><?php echo esc_html($this->error_message); ?></p>
+            <?php
+            foreach ($this->error_messages as $error) {
+                echo "<p>" . esc_html($error) . '</p>';
+            }
+            ?>
         </div>
     <?php endif; ?>
 
@@ -58,44 +73,75 @@ $template = get_option('tgon_message_template', "Order {order_id} placed by {buy
     <form method="post" action="">
         <table class="form-table">
             <tr valign="top">
-                <th scope="row"><?php _e('Pipedream Endpoint', 'wc-tgon') ?></th>
-                <td><input type="text" dir='ltr' name="pipedream_endpoint" value="<?php echo esc_attr($pipedream_endpoint); ?>" size="50" /></td>
+                <th scope="row"><?php esc_html_e('Telegram Bot API Token', 'telegram-order-notification') ?></th>
+                <td><input type="text" dir='ltr' name="api_token" value="<?php echo esc_attr($api_token); ?>" size="60" /></td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Telegram Bot API Token', 'wc-tgon') ?></th>
-                <td><input type="text" dir='ltr' name="api_token" value="<?php echo esc_attr($api_token); ?>" size="90" /></td>
-            </tr>
-            <tr valign="top">
-                <th scope="row"><?php _e('Chat ID', 'wc-tgon') ?></th>
+                <th scope="row"><?php esc_html_e('Telegram Chat ID', 'telegram-order-notification') ?></th>
                 <td><input type="text" dir='ltr' name="chat_id" value="<?php echo esc_attr($chat_id); ?>" size="50" /></td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Send message when order is :', 'wc-tgon') ?></th>
+                <th scope="row"><?php esc_html_e('Send message when order is :', 'telegram-order-notification') ?></th>
                 <td>
-                    <input type="checkbox" name="order_statuses[]" value="on-hold" <?php checked(in_array('on-hold', $options)); ?>><?php _e('On hold', 'wc-tgon')?><br>
-                    <input type="checkbox" name="order_statuses[]" value="processing" <?php checked(in_array('processing', $options)); ?>><?php _e('Processing', 'wc-tgon')?><br>
-                    <input type="checkbox" name="order_statuses[]" value="cancelled" <?php checked(in_array('cancelled', $options)); ?>><?php _e('Cancelled', 'wc-tgon')?><br>
-                    <input type="checkbox" name="order_statuses[]" value="failed" <?php checked(in_array('failed', $options)); ?>><?php _e('Failed', 'wc-tgon')?><br>
+                    <input type="checkbox" name="acceptable_order_statuses[]" value="on-hold" <?php checked(in_array('on-hold', $order_status_options)); ?>><?php esc_html_e('On hold', 'telegram-order-notification') ?><br>
+                    <input type="checkbox" name="acceptable_order_statuses[]" value="processing" <?php checked(in_array('processing', $order_status_options)); ?>><?php esc_html_e('Processing', 'telegram-order-notification') ?><br>
+                    <input type="checkbox" name="acceptable_order_statuses[]" value="cancelled" <?php checked(in_array('cancelled', $order_status_options)); ?>><?php esc_html_e('Cancelled', 'telegram-order-notification') ?><br>
+                    <input type="checkbox" name="acceptable_order_statuses[]" value="failed" <?php checked(in_array('failed', $order_status_options)); ?>><?php esc_html_e('Failed', 'telegram-order-notification') ?><br>
                 </td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Message Template', 'wc-tgon') ?></th>
+                <th scope="row"><?php esc_html_e('Send request to telegram api using a middleman :', 'telegram-order-notification') ?></th>
+                <td>
+                    <input type="checkbox" name="use_middleman" id="use-middleman-checkbox" <?php checked(1, $use_middleman) ?>>
+                </td>
+            </tr>
+            <tr valign="top" id="middleman-endpoint-row" style="display: none;">
+                <th scope="row"><?php esc_html_e('Middleman Endpoint', 'telegram-order-notification') ?></th>
+                <td><input type="text" dir='ltr' name="middleman_endpoint" value="<?php echo esc_attr($middleman_endpoint); ?>" size="50" /></td>
+            </tr>
+            <tr valign="top">
+                <th scope="row"><?php esc_html_e('Message Template', 'telegram-order-notification') ?></th>
                 <td>
                     <textarea name='message_template' rows='8' cols='50' class='large-text'><?php echo esc_attr($template); ?></textarea>
                     <p class='description'>
                         <?php
-                        _e('Customize the message format that will be sent to Telegram. Use the following placeholders to insert order details dynamically:', 'wc-tgon');
+                        esc_html_e('Customize the message format that will be sent to Telegram. Use the following placeholders to insert order details dynamically:', 'telegram-order-notification');
                         echo "<br/><br/>";
 
                         // Render message template placeholders with descriptions
                         foreach ($this->template_placeholders as $placeholder => $description) {
-                            echo "$placeholder : $description <br/>";
+                            echo esc_html($placeholder) . " : " . esc_html($description) . "<br/>";
                         }
                         ?>
                     </p>
                 </td>
             </tr>
         </table>
-        <?php submit_button(__('Save Settings', 'wc-tgon'), 'primary', 'tgon_save_settings'); ?>
+        <?php submit_button(esc_html__('Save Settings', 'telegram-order-notification'), 'primary', 'tgon_save_settings'); ?>
     </form>
 </div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the checkbox and the middleman endpoint row
+        var checkbox = document.getElementById('use-middleman-checkbox');
+        var middlemanEndpointRow = document.getElementById('middleman-endpoint-row');
+
+        // Toggle visibility based on checkbox state
+        checkbox.addEventListener('change', function() {
+            if (checkbox.checked) {
+                middlemanEndpointRow.style.display = 'table-row';
+            } else {
+                middlemanEndpointRow.style.display = 'none';
+            }
+        });
+
+        // Set initial visibility based on checkbox state
+        if (checkbox.checked) {
+            middlemanEndpointRow.style.display = 'table-row';
+        } else {
+            middlemanEndpointRow.style.display = 'none';
+        }
+    });
+</script>

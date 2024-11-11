@@ -27,10 +27,11 @@ class tgon_telegram_message
     public function prepare_message()
     {
         // Default message template with placeholders for order details
-        $default_message_template = "Order {order_id} placed by {buyer_name} for a total of {total}.";
+        $default_message_template = esc_html__('Order {order_id} placed by {buyer_name} for a total of {total}.', 'telegram-order-notification');
 
         // Retrieve the custom message template from the plugin settings, if any
-        $message_template = get_option('tgon_message_template', $default_message_template);
+        $settings = get_option('tgon_settings', []);
+        $message_template = $settings['message_template'] ?? $default_message_template;
 
         // Get the order object
         $order_obj = $this->order;
@@ -76,19 +77,22 @@ class tgon_telegram_message
     /**
      * Sends the prepared message to the Telegram bot via the provided API.
      *
-     * This function sends a POST request to the Telegram bot using the Pipedream endpoint, 
+     * This function sends a POST request to the Telegram bot using the middleman endpoint, 
      * which processes and forwards the message to the designated Telegram chat.
      */
     public function send_message()
     {
         // Retrieve necessary values from the plugin settings
-        $pipedream_endpoint = get_option('tgon_pipedream_endpoint', ''); // Pipedream endpoint URL
-        $chat_id = get_option('tgon_chat_id', ''); // Telegram chat ID
-        $api_token = get_option('tgon_api_token', ''); // Telegram bot API token
+        $settings = get_option('tgon_settings', []);
+
+        $use_middleman = (isset($settings['use_middleman']) and in_array($settings['use_middleman'], [0, 1])) ? $settings['use_middleman'] : 0;
+        $middleman_endpoint = $settings['middleman_endpoint'] ?? ''; // middleman endpoint URL
+        $chat_id = $settings['chat_id'] ?? ''; // Telegram chat ID
+        $api_token = $settings['api_token'] ?? ''; // Telegram bot API token
 
         // Ensure all required parameters are set before sending the message
         if (
-            empty($pipedream_endpoint) or
+            ($use_middleman === 1 and empty($middleman_endpoint)) or
             empty($chat_id) or
             empty($api_token) or
             empty($this->message_text)
@@ -96,28 +100,57 @@ class tgon_telegram_message
             return; // If any parameters are missing, do nothing
         }
 
+        if ($use_middleman === 0) {
+            $response = $this->send_message_directly_to_telegram($api_token, $chat_id);
+            echo "direct";
+        } else {
+            $response = $this->send_message_using_middleman($api_token, $chat_id, $middleman_endpoint);
+            echo "using middleman";
+        }
+
+        // Handle the response (error or success)
+        if (is_wp_error($response)) {
+            // $error_message = $response->get_error_message();
+        } else {
+            // $body = wp_remote_retrieve_body($response);
+        }
+    }
+
+    public function send_message_directly_to_telegram($api_token, $chat_id)
+    {
+        // Prepare the payload for the POST request
+        $Payloads = [
+            "text" => $this->message_text,
+            "parse_mode" => 'HTML',
+            "chat_id" => $chat_id,
+        ];
+
+        $telegram_api_address = "https://api.telegram.org/bot{$api_token}/SendMessage";
+        // Send the message to Telegram using the middleman endpoint
+        $response = wp_remote_post($telegram_api_address, array(
+            'method'      => 'POST',
+            'headers'     => array('Content-Type' => 'application/json'),
+            'body'        => wp_json_encode($Payloads),
+        ));
+
+        return $response;
+    }
+
+    public function send_message_using_middleman($api_token, $chat_id, $middleman_endpoint)
+    {
         // Prepare the payload for the POST request
         $Payloads = [
             "msg" => $this->message_text,
             "api_token" => $api_token,
             "chat_id" => $chat_id,
         ];
-
-        // Send the message to Telegram using the Pipedream endpoint
-        $response = wp_remote_post($pipedream_endpoint, array(
+        // Send the message to Telegram using the middleman endpoint
+        $response = wp_remote_post($middleman_endpoint, array(
             'method'      => 'POST',
             'headers'     => array('Content-Type' => 'application/json'),
-            'body'        => json_encode($Payloads),
-            'sslverify'   => false, // Bypass SSL verification (set to true in production)
+            'body'        => wp_json_encode($Payloads),
         ));
 
-        // Handle the response (error or success)
-        if (is_wp_error($response)) {
-            // If there was an error, you can log or handle the error message
-            // $error_message = $response->get_error_message();
-        } else {
-            // If the request was successful, you can process the response if needed
-            // $body = wp_remote_retrieve_body($response);
-        }
+        return $response;
     }
 }

@@ -11,11 +11,11 @@ function tgon_add_admin_menu()
     // Add a submenu to the WooCommerce menu
     add_submenu_page(
         'woocommerce', // Parent slug (WooCommerce)
-        __('Telegram Notifications', 'wc-tgon'), // Page title
-        __('Telegram Notifications', 'wc-tgon'), // Menu title
+        __('Telegram Notifications', 'telegram-order-notification'), // Page title
+        __('Telegram Notifications', 'telegram-order-notification'), // Menu title
         'manage_options', // Required capability to access the page
-        'wc_telegram_notifications', // Menu slug
-        'tgon_settings_page_callback' // Function to display the settings page
+        'wc-telegram-order-notifications', // Menu slug
+        'tgon_settings_page_callback', // Function to display the settings page
     );
 }
 
@@ -35,7 +35,7 @@ function tgon_settings_page_callback()
 class Tgon_admin
 {
     public $input = []; // Holds the user inputs from the settings page
-    public $error_message = ''; // Holds any validation error messages
+    public $error_messages = []; // Holds any validation error messages
 
     // List of available placeholders for message template
     public $template_placeholders = [];
@@ -47,17 +47,20 @@ class Tgon_admin
     {
         $this->template_placeholders =
             [
-                '{order_id}'        => __('The unique ID of the order', 'wc-tgon'),
-                '{order_date}'      => __('The date the order was placed', 'wc-tgon'),
-                '{buyer_name}'      => __('The buyer\'s full name', 'wc-tgon'),
-                '{full_address}'    => __('The full shipping address', 'wc-tgon'),
-                '{postal_code}'     => __('The postal code for shipping', 'wc-tgon'),
-                '{phone_number}'    => __('The buyer\'s phone number', 'wc-tgon'),
-                '{shipping_method}' => __('The shipping method chosen', 'wc-tgon'),
-                '{customer_note}'   => __('Any note added by the customer', 'wc-tgon'),
-                '{total}'           => __('The total payment amount', 'wc-tgon'),
-                '{shipping_total}'  => __('The total shipping cost', 'wc-tgon'),
-                '{items}'           => __('A list of items ordered', 'wc-tgon'),
+                '{status}'        => __('The status of the order', 'telegram-order-notification'),
+                '{id}'        => __('The unique ID of the order', 'telegram-order-notification'),
+                '{date}'      => __('The date the order was placed', 'telegram-order-notification'),
+                '{buyer_name}'      => __('The buyer\'s full name', 'telegram-order-notification'),
+                '{full_address}'    => __('The full shipping address', 'telegram-order-notification'),
+                '{postal_code}'     => __('The postal code for shipping', 'telegram-order-notification'),
+                '{phone_number}'    => __('The buyer\'s phone number', 'telegram-order-notification'),
+                '{payment_method}'    => __('The payment method used to pay this order', 'telegram-order-notification'),
+                '{shipping_method}' => __('The shipping method chosen', 'telegram-order-notification'),
+                '{customer_note}'   => __('Any note added by the customer', 'telegram-order-notification'),
+                '{total}'           => __('The total payment amount', 'telegram-order-notification'),
+                '{shipping_total}'  => __('The total shipping cost', 'telegram-order-notification'),
+                '{items}'           => __('A list of items ordered', 'telegram-order-notification'),
+                '{divider}'         => __('A divider line (multiple dashes) for message readability', 'telegram-order-notification'),
             ];
     }
 
@@ -72,23 +75,30 @@ class Tgon_admin
         }
 
         // Retrieve the message template and sanitize it
-        $this->input['message_template'] = isset($_POST['message_template']) ? htmlspecialchars($_POST['message_template']) : null;
+        $this->input['message_template'] = isset($_POST['message_template']) ? sanitize_textarea_field($_POST['message_template']) : null;
 
         // Retrieve the selected order statuses and enable Persian date flag
-        $this->input['order_statuses'] = isset($_POST['order_statuses']) ? $_POST['order_statuses'] : null;
-        $this->input['enable_persian_date'] = isset($_POST['enable_persian_date']) ? $_POST['enable_persian_date'] : null;
+        $this->input['acceptable_order_statuses'] = isset($_POST['acceptable_order_statuses']) ? array_map('sanitize_text_field', $_POST['acceptable_order_statuses']) : [];
+
+        $this->input['use_middleman'] = isset($_POST['use_middleman']) ? 1 : 0;
     }
 
     /**
      * Validates the inputs provided by the user on the settings page.
-     * Currently, it checks if the Pipedream endpoint URL is valid.
+     * Currently, it checks if the middleman endpoint URL is valid.
      */
     public function validate_inputs()
     {
-        // Check if the Pipedream endpoint URL is valid
-        if (!filter_var($this->input['pipedream_endpoint'], FILTER_VALIDATE_URL)) {
+        // Check if the middleman endpoint URL is valid. check the URL vlaue only if use_middleman is checked. otherwise we do not update the endpoint url.
+        if ($this->input['use_middleman'] === 1 and !filter_var($this->input['middleman_endpoint'], FILTER_VALIDATE_URL)) {
             // Set error message if the URL is invalid
-            $this->error_message = __('Invalid URL for the Pipedream endpoint. Please enter a valid URL.', 'wc-tgon');
+            $this->error_messages[] = __('Invalid URL for the middleman endpoint. Please enter a valid URL.', 'telegram-order-notification');
+        }
+
+        // Check if the selected order status options are valid
+        $safe_list = ['on-hold', 'processing', 'cancelled', 'failed'];
+        if (!empty(array_diff($this->input['acceptable_order_statuses'], $safe_list))) {
+            $this->error_messages[] = __('Invalid options for order statuses.', 'telegram-order-notification');
         }
     }
 

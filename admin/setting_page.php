@@ -74,8 +74,10 @@ $template = get_option('tgon_message_template', "Order {order_id} placed by {buy
             <tr valign="top">
                 <th scope="row"><?php _e('Send message when order is :', 'wc-tgon') ?></th>
                 <td>
-                    <input type="checkbox" name="order_statuses[]" value="on-hold" <?php checked(in_array('on-hold', $options)); ?>> On-Hold<br>
-                    <input type="checkbox" name="order_statuses[]" value="processing" <?php checked(in_array('processing', $options)); ?>> Processing<br>
+                    <input type="checkbox" name="order_statuses[]" value="on-hold" <?php checked(in_array('on-hold', $options)); ?>><?php _e('On hold', 'wc-tgon')?><br>
+                    <input type="checkbox" name="order_statuses[]" value="processing" <?php checked(in_array('processing', $options)); ?>><?php _e('Processing', 'wc-tgon')?><br>
+                    <input type="checkbox" name="order_statuses[]" value="cancelled" <?php checked(in_array('cancelled', $options)); ?>><?php _e('Cancelled', 'wc-tgon')?><br>
+                    <input type="checkbox" name="order_statuses[]" value="failed" <?php checked(in_array('failed', $options)); ?>><?php _e('Failed', 'wc-tgon')?><br>
                 </td>
             </tr>
             <tr valign="top">

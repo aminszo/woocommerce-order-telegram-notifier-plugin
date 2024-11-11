@@ -28,7 +28,7 @@ class tgon_telegram_message
     {
         // Default message template with placeholders for order details
         $default_message_template = "Order {order_id} placed by {buyer_name} for a total of {total}.";
-        
+
         // Retrieve the custom message template from the plugin settings, if any
         $message_template = get_option('tgon_message_template', $default_message_template);
 
@@ -41,12 +41,8 @@ class tgon_telegram_message
         // Add order status to the data array
         $order['{status}'] = $order_obj->get_status(); // Get the current status of the order
 
-        // Set the order date depending on the order status
-        if ($order['{status}'] === 'on-hold') {
-            $order['{date}'] = $order_obj->get_date_created();  // Order creation date
-        } else {
-            $order['{date}'] = $order_obj->get_date_paid();  // Order paid date
-        }
+        // Set the order date to the payment date if available; otherwise, use the order creation date as a fallback.
+        $order['{date}'] = $order_obj->get_date_paid() ?? $order_obj->get_date_created();
 
         // Check if Persian (Jalali) date conversion is enabled
         $enable_persian_date = get_option('tgon_enable_persian_date', false);

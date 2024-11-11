@@ -42,11 +42,12 @@ function tgon_send_new_order_to_telegram($order_id)
     $order = wc_get_order($order_id);
 
     // Retrieve selected order statuses from the plugin settings (defaults to 'on-hold' and 'processing')
-    $statuses = get_option('tgon_order_statuses', ['on-hold', 'processing']);
+    $default_acceptable_statuses = ['on-hold', 'processing', 'cancelled', 'failed'];
+
+    $statuses = get_option('tgon_order_statuses', $default_acceptable_statuses);
 
     // If no statuses are set, use an empty array to prevent errors
-    if (empty($statuses))
-        $statuses = [];
+    empty($statuses) && $statuses = [];
 
     // Check if the order's current status is in the list of selected statuses
     if (! in_array($order->get_status(), $statuses))
@@ -61,10 +62,12 @@ function tgon_send_new_order_to_telegram($order_id)
     // Send the formatted message to the Telegram channel
     $tg_message->send_message();
 }
-// Hook into WooCommerce order status changes (on-hold and processing)
+// Hook into WooCommerce order status changes (on-hold, processing, cancelled, failed)
 add_action('woocommerce_order_status_on-hold', 'tgon_send_new_order_to_telegram');
 add_action('woocommerce_order_status_processing', 'tgon_send_new_order_to_telegram');
-// You could add additional status hooks here, such as 'completed', 'cancelled', etc.
+add_action('woocommerce_order_status_cancelled', 'tgon_send_new_order_to_telegram');
+add_action('woocommerce_order_status_failed', 'tgon_send_new_order_to_telegram');
+// You could add additional status hooks here, such as 'completed', 'pending payment', etc.
 
 // Uncomment the following line if you want to trigger the message on the Thank You page as well (for easy debugging and development)
 // add_action('woocommerce_thankyou', 'tgon_send_new_order_to_telegram'); // Trigger message on 'thankyou' page (this can be problematic if the page is reloaded)

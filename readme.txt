@@ -5,8 +5,8 @@ Requires at least: 5.5
 Tested up to: 6.6.2
 Requires PHP: 7.4
 Stable tag: 1.0
-License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+License: GPLv3
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 Telegram Order Notifications is a WooCommerce plugin that allows you to send real-time notifications to Telegram whenever a new order is placed.
 

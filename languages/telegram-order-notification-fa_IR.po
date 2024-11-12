@@ -6,7 +6,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/telegram-order-"
 "notification\n"
 "POT-Creation-Date: 2024-11-12T15:04:53+01:00\n"
-"PO-Revision-Date: 2024-11-12 17:35+0330\n"
+"PO-Revision-Date: 2024-11-12 18:10+0330\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fa_IR\n"
@@ -19,7 +19,7 @@ msgstr ""
 #. Plugin Name of the plugin
 #: plugin.php
 msgid "Telegram Order Notification"
-msgstr "نوتیفیکشن سفارش تلگرام"
+msgstr "اطلاع رسانی سفارشات در تلگرام"
 
 #. Plugin URI of the plugin
 #: plugin.php
@@ -75,11 +75,11 @@ msgstr "شماره تلفن خریدار"
 
 #: admin/settings.php:57
 msgid "The payment method used to pay this order"
-msgstr "روش پرداختی استفاده شده"
+msgstr "روش پرداخت استفاده شده"
 
 #: admin/settings.php:58
 msgid "The shipping method chosen"
-msgstr "روش حمل و نقل استفاده شده"
+msgstr "روش حمل و نقل انتخاب شده"
 
 #: admin/settings.php:59
 msgid "Any note added by the customer"
@@ -99,7 +99,7 @@ msgstr "لیست اقلام سفارش داده شده"
 
 #: admin/settings.php:63
 msgid "A divider line (multiple dashes) for message readability"
-msgstr "یک خط جداکننده (چند خط تیره) برای خوانایی پیام"
+msgstr "جداکننده (چند خط تیره) برای خوانایی پیام"
 
 #: admin/settings.php:74 admin/setting_page.php:8
 msgid "Security check failed!"

@@ -3,6 +3,11 @@
 // Save settings if the form is submitted
 if (isset($_POST['tgon_save_settings'])) {
 
+
+    if (!check_admin_referer('tgon_save_settings_action', 'tgon_save_settings_nonce')) {
+        wp_die(esc_html__('Security check failed!', 'telegram-order-notification'));
+    }
+
     // Retrieve and sanitize input values from the form submission
     $this->retrieve_post_inputs([
         'middleman_endpoint',
@@ -44,7 +49,7 @@ if (isset($_POST['tgon_save_settings'])) {
 // Retrieve existing values from the options table to pre-populate the form
 $saved_settings = get_option('tgon_settings', []);
 
-$use_middleman = (isset($saved_settings['use_middleman']) and in_array($saved_settings['use_middleman'], [0,1])) ? $saved_settings['use_middleman'] : 0;
+$use_middleman = (isset($saved_settings['use_middleman']) and in_array($saved_settings['use_middleman'], [0, 1])) ? $saved_settings['use_middleman'] : 0;
 $middleman_endpoint = $saved_settings['middleman_endpoint'] ?? '';
 $chat_id = $saved_settings['chat_id'] ?? ''; // Chat ID for Telegram
 $api_token = $saved_settings['api_token'] ?? ''; // Telegram API token
@@ -71,6 +76,11 @@ $template = $saved_settings['message_template'] ?? esc_html__('Order {order_id} 
 
     <!-- Form for saving the settings -->
     <form method="post" action="">
+        <?php
+        // Add nonce field to form
+        wp_nonce_field('tgon_save_settings_action', 'tgon_save_settings_nonce');
+        ?>
+
         <table class="form-table">
             <tr valign="top">
                 <th scope="row"><?php esc_html_e('Telegram Bot API Token', 'telegram-order-notification') ?></th>
@@ -93,6 +103,15 @@ $template = $saved_settings['message_template'] ?? esc_html__('Order {order_id} 
                 <th scope="row"><?php esc_html_e('Send request to telegram api using a middleman :', 'telegram-order-notification') ?></th>
                 <td>
                     <input type="checkbox" name="use_middleman" id="use-middleman-checkbox" <?php checked(1, $use_middleman) ?>>
+                    <p class="description">
+                        <?php
+                        esc_html_e("This option allows you to route requests to the Telegram API through an intermediary service (middleman).", 'telegram-order-notification');
+                        echo "<br />";
+                        esc_html_e("Enabling this can be useful if direct access to the Telegram API is restricted in your server.", 'telegram-order-notification');
+                        echo "<br />";
+                        esc_html_e("After enabling, you will need to specify the middleman endpoint you want to use.", 'telegram-order-notification');
+                        ?>
+                    </p>
                 </td>
             </tr>
             <tr valign="top" id="middleman-endpoint-row" style="display: none;">

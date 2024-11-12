@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-11-11T18:22:19+01:00\n"
+"POT-Creation-Date: 2024-11-12T15:04:53+01:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: telegram-order-notification\n"
@@ -100,71 +100,88 @@ msgstr ""
 msgid "A divider line (multiple dashes) for message readability"
 msgstr ""
 
-#: admin/settings.php:95
+#: admin/settings.php:74
+#: admin/setting_page.php:8
+msgid "Security check failed!"
+msgstr ""
+
+#: admin/settings.php:99
 msgid "Invalid URL for the middleman endpoint. Please enter a valid URL."
 msgstr ""
 
-#: admin/settings.php:101
+#: admin/settings.php:105
 msgid "Invalid options for order statuses."
 msgstr ""
 
-#: admin/setting_page.php:40
+#: admin/setting_page.php:45
 msgid "Settings saved!"
 msgstr ""
 
-#: admin/setting_page.php:56
+#: admin/setting_page.php:61
 #: includes/class-telegram-message.php:30
 msgid "Order {order_id} placed by {buyer_name} for a total of {total}."
 msgstr ""
 
-#: admin/setting_page.php:59
+#: admin/setting_page.php:64
 msgid "Telegram Notifications Settings"
 msgstr ""
 
-#: admin/setting_page.php:76
+#: admin/setting_page.php:86
 msgid "Telegram Bot API Token"
 msgstr ""
 
-#: admin/setting_page.php:80
+#: admin/setting_page.php:90
 msgid "Telegram Chat ID"
 msgstr ""
 
-#: admin/setting_page.php:84
+#: admin/setting_page.php:94
 msgid "Send message when order is :"
 msgstr ""
 
-#: admin/setting_page.php:86
+#: admin/setting_page.php:96
 msgid "On hold"
 msgstr ""
 
-#: admin/setting_page.php:87
+#: admin/setting_page.php:97
 msgid "Processing"
 msgstr ""
 
-#: admin/setting_page.php:88
+#: admin/setting_page.php:98
 msgid "Cancelled"
 msgstr ""
 
-#: admin/setting_page.php:89
+#: admin/setting_page.php:99
 msgid "Failed"
 msgstr ""
 
-#: admin/setting_page.php:93
+#: admin/setting_page.php:103
 msgid "Send request to telegram api using a middleman :"
 msgstr ""
 
-#: admin/setting_page.php:99
+#: admin/setting_page.php:108
+msgid "This option allows you to route requests to the Telegram API through an intermediary service (middleman)."
+msgstr ""
+
+#: admin/setting_page.php:110
+msgid "Enabling this can be useful if direct access to the Telegram API is restricted in your server."
+msgstr ""
+
+#: admin/setting_page.php:112
+msgid "After enabling, you will need to specify the middleman endpoint you want to use."
+msgstr ""
+
+#: admin/setting_page.php:118
 msgid "Middleman Endpoint"
 msgstr ""
 
-#: admin/setting_page.php:103
+#: admin/setting_page.php:122
 msgid "Message Template"
 msgstr ""
 
-#: admin/setting_page.php:108
+#: admin/setting_page.php:127
 msgid "Customize the message format that will be sent to Telegram. Use the following placeholders to insert order details dynamically:"
 msgstr ""
 
-#: admin/setting_page.php:120
+#: admin/setting_page.php:139
 msgid "Save Settings"
 msgstr ""

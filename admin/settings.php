@@ -69,16 +69,20 @@ class Tgon_admin
      */
     public function retrieve_post_inputs($field_names)
     {
+
+        if (!check_admin_referer('tgon_save_settings_action', 'tgon_save_settings_nonce')) {
+            wp_die(esc_html__('Security check failed!', 'telegram-order-notification'));
+        }
         // Loop through the list of field names and retrieve their values from the POST request
         foreach ($field_names as $field) {
-            $this->input[$field] = isset($_POST[$field]) ? sanitize_text_field($_POST[$field]) : null;
+            $this->input[$field] = isset($_POST[$field]) ? sanitize_text_field(wp_unslash($_POST[$field])) : null;
         }
 
         // Retrieve the message template and sanitize it
-        $this->input['message_template'] = isset($_POST['message_template']) ? sanitize_textarea_field($_POST['message_template']) : null;
+        $this->input['message_template'] = isset($_POST['message_template']) ? sanitize_textarea_field(wp_unslash($_POST['message_template'])) : null;
 
         // Retrieve the selected order statuses and enable Persian date flag
-        $this->input['acceptable_order_statuses'] = isset($_POST['acceptable_order_statuses']) ? array_map('sanitize_text_field', $_POST['acceptable_order_statuses']) : [];
+        $this->input['acceptable_order_statuses'] = isset($_POST['acceptable_order_statuses']) ? array_map('sanitize_text_field', wp_unslash($_POST['acceptable_order_statuses'])) : [];
 
         $this->input['use_middleman'] = isset($_POST['use_middleman']) ? 1 : 0;
     }

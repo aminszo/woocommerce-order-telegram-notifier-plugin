@@ -5,8 +5,8 @@ msgstr ""
 "Project-Id-Version: Telegram Order Notification 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/telegram-order-"
 "notification\n"
-"POT-Creation-Date: 2024-11-11T18:22:19+01:00\n"
-"PO-Revision-Date: 2024-11-11 20:53+0330\n"
+"POT-Creation-Date: 2024-11-12T15:04:53+01:00\n"
+"PO-Revision-Date: 2024-11-12 17:35+0330\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fa_IR\n"
@@ -101,67 +101,94 @@ msgstr "لیست اقلام سفارش داده شده"
 msgid "A divider line (multiple dashes) for message readability"
 msgstr "یک خط جداکننده (چند خط تیره) برای خوانایی پیام"
 
-#: admin/settings.php:95
+#: admin/settings.php:74 admin/setting_page.php:8
+msgid "Security check failed!"
+msgstr "بررسی امنیتی شکست خورد!"
+
+#: admin/settings.php:99
 msgid "Invalid URL for the middleman endpoint. Please enter a valid URL."
 msgstr "URL نامعتبر برای آدرس واسطه. لطفاً یک URL معتبر وارد کنید."
 
-#: admin/settings.php:101
+#: admin/settings.php:105
 msgid "Invalid options for order statuses."
 msgstr "گزینه های نامعتبر برای وضعیت سفارش."
 
-#: admin/setting_page.php:40
+#: admin/setting_page.php:45
 msgid "Settings saved!"
 msgstr "تنظیمات ذخیره شد!"
 
-#: admin/setting_page.php:56 includes/class-telegram-message.php:30
+#: admin/setting_page.php:61 includes/class-telegram-message.php:30
 msgid "Order {order_id} placed by {buyer_name} for a total of {total}."
 msgstr "سفارش {order_id} توسط {buyer_name} به مبلغ {total} ثبت شد."
 
-#: admin/setting_page.php:59
+#: admin/setting_page.php:64
 msgid "Telegram Notifications Settings"
 msgstr "تنظیمات نوتیفیکشن تلگرام"
 
-#: admin/setting_page.php:76
+#: admin/setting_page.php:86
 msgid "Telegram Bot API Token"
 msgstr "توکن API ربات تلگرام"
 
-#: admin/setting_page.php:80
+#: admin/setting_page.php:90
 msgid "Telegram Chat ID"
 msgstr "آیدی چت تلگرام"
 
-#: admin/setting_page.php:84
+#: admin/setting_page.php:94
 msgid "Send message when order is :"
 msgstr "ارسال پیام برای سفارش های :"
 
-#: admin/setting_page.php:86
+#: admin/setting_page.php:96
 msgid "On hold"
 msgstr "در انتظار"
 
-#: admin/setting_page.php:87
+#: admin/setting_page.php:97
 msgid "Processing"
 msgstr "در حال انجام"
 
-#: admin/setting_page.php:88
+#: admin/setting_page.php:98
 msgid "Cancelled"
 msgstr "لغو شده"
 
-#: admin/setting_page.php:89
+#: admin/setting_page.php:99
 msgid "Failed"
 msgstr "ناموفق"
 
-#: admin/setting_page.php:93
+#: admin/setting_page.php:103
 msgid "Send request to telegram api using a middleman :"
 msgstr "ارسال درخواست به api تلگرام با استفاده از واسطه:"
 
-#: admin/setting_page.php:99
+#: admin/setting_page.php:108
+msgid ""
+"This option allows you to route requests to the Telegram API through an "
+"intermediary service (middleman)."
+msgstr ""
+"این گزینه به شما اجازه می دهد تا درخواست ها را از طریق یک سرویس واسطه به API "
+"تلگرام بفرستید."
+
+#: admin/setting_page.php:110
+msgid ""
+"Enabling this can be useful if direct access to the Telegram API is "
+"restricted in your server."
+msgstr ""
+"اگر دسترسی مستقیم به API تلگرام در سرور شما محدود شده باشد، فعال کردن این "
+"گزینه میتواند مفید باشد."
+
+#: admin/setting_page.php:112
+msgid ""
+"After enabling, you will need to specify the middleman endpoint you want to "
+"use."
+msgstr ""
+"پس از فعال کردن، باید آدرس واسطه ای را که می خواهید استفاده کنید، مشخص کنید."
+
+#: admin/setting_page.php:118
 msgid "Middleman Endpoint"
 msgstr "آدرس واسطه ارسال پیام"
 
-#: admin/setting_page.php:103
+#: admin/setting_page.php:122
 msgid "Message Template"
 msgstr "الگوی پیام"
 
-#: admin/setting_page.php:108
+#: admin/setting_page.php:127
 msgid ""
 "Customize the message format that will be sent to Telegram. Use the "
 "following placeholders to insert order details dynamically:"
@@ -169,6 +196,6 @@ msgstr ""
 "فرمت پیامی که به تلگرام ارسال می شود را سفارشی کنید. از متغیرهای زیر برای "
 "درج جزئیات سفارش استفاده کنید:"
 
-#: admin/setting_page.php:120
+#: admin/setting_page.php:139
 msgid "Save Settings"
 msgstr "ذخیره تنظیمات"

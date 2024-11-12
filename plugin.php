@@ -9,6 +9,8 @@
  * Author URI: https://aminlog.ir
  * Text Domain: telegram-order-notification
  * Domain Path: /languages
+ * License: GPLv3
+ * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  */
 
 defined('ABSPATH') || exit; // Ensures the file is not accessed directly

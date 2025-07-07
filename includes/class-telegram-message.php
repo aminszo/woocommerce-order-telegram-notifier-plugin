@@ -80,7 +80,7 @@ class tgon_telegram_message
      * This function sends a POST request to the Telegram bot using the middleman endpoint, 
      * which processes and forwards the message to the designated Telegram chat.
      */
-    public function send_message()
+    public static function send_message($message_text)
     {
         // Retrieve necessary values from the plugin settings
         $settings = get_option('tgon_settings', []);
@@ -95,17 +95,17 @@ class tgon_telegram_message
             ($use_middleman === 1 and empty($middleman_endpoint)) or
             empty($chat_id) or
             empty($api_token) or
-            empty($this->message_text)
+            empty($message_text)
         ) {
             return; // If any parameters are missing, do nothing
         }
 
         if ($use_middleman === 0) {
-            $response = $this->send_message_directly_to_telegram($api_token, $chat_id);
-            echo "direct";
+            $response = self::send_message_directly_to_telegram($api_token, $chat_id, $message_text);
+            // echo "direct";
         } else {
-            $response = $this->send_message_using_middleman($api_token, $chat_id, $middleman_endpoint);
-            echo "using middleman";
+            $response = self::send_message_using_middleman($api_token, $chat_id, $middleman_endpoint, $message_text);
+            // echo "using middleman";
         }
 
         // Handle the response (error or success)
@@ -114,13 +114,15 @@ class tgon_telegram_message
         } else {
             // $body = wp_remote_retrieve_body($response);
         }
+
+        return;
     }
 
-    public function send_message_directly_to_telegram($api_token, $chat_id)
+    private static function send_message_directly_to_telegram($api_token, $chat_id, $message_text)
     {
         // Prepare the payload for the POST request
         $Payloads = [
-            "text" => $this->message_text,
+            "text" => $message_text,
             "parse_mode" => 'HTML',
             "chat_id" => $chat_id,
         ];
@@ -136,11 +138,11 @@ class tgon_telegram_message
         return $response;
     }
 
-    public function send_message_using_middleman($api_token, $chat_id, $middleman_endpoint)
+    private static function send_message_using_middleman($api_token, $chat_id, $middleman_endpoint, $message_text)
     {
         // Prepare the payload for the POST request
         $Payloads = [
-            "msg" => $this->message_text,
+            "msg" => $message_text,
             "api_token" => $api_token,
             "chat_id" => $chat_id,
         ];
@@ -152,5 +154,16 @@ class tgon_telegram_message
         ));
 
         return $response;
+    }
+
+    public static function test_message($text)
+    {
+        self::send_message($text);
+        $response = array(
+            'message' => 'test message sent',
+        );
+
+        // Return a JSON response
+        wp_send_json_success($response);
     }
 }

@@ -138,6 +138,8 @@ $template = $saved_settings['message_template'] ?? esc_html__('Order {order_id} 
         </table>
         <?php submit_button(esc_html__('Save Settings', 'telegram-order-notification'), 'primary', 'tgon_save_settings'); ?>
     </form>
+
+    <button id="my-button">test message</button>
 </div>
 
 
